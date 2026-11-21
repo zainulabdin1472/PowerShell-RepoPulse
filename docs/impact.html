@@ -6,71 +6,85 @@
   <title>RepoHealth impact — zainulabdin1472</title>
   <style>
     :root {
-      --paper: #f4f0e6;
-      --ink: #1c1915;
-      --muted: #5e584e;
-      --line: #d9d1c3;
-      --card: #fffdf8;
-      --stale: #9a3412;
-      --stale-soft: #f3e2d6;
-      --fresh: #1f6b4a;
+      --bg: #ebe4d8;
+      --board: #fbf7f1;
+      --ink: #1b1714;
+      --muted: #6d655c;
+      --line: #e3d9cb;
+      --stale: #8d3d24;
+      --stale-soft: #f6e6dc;
+      --fresh: #1d6a46;
       --fresh-soft: #dceadf;
-      --mark: #1c1915;
+      --track: #efe6d8;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: var(--paper);
+      background: var(--bg);
       color: var(--ink);
       font-family: "Segoe UI", "Helvetica Neue", sans-serif;
       line-height: 1.45;
     }
     main {
-      width: min(980px, calc(100% - 32px));
+      width: min(1040px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 40px 0 64px;
+      padding: 28px 0 56px;
     }
-    header p, .note, figcaption, footer {
+    .board {
+      background: var(--board);
+      border: 1px solid #ddd3c4;
+      border-top: 3px solid var(--ink);
+      padding: 18px 20px 16px;
+      margin-bottom: 14px;
+    }
+    .board.stale { border-top-color: var(--stale); }
+    .board.fresh { border-top-color: var(--fresh); }
+    .kicker {
+      margin: 0 0 6px;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
     }
     h1 {
-      margin: 8px 0 12px;
-      font-family: Palatino, "Palatino Linotype", "Iowan Old Style", serif;
-      font-size: 42px;
+      margin: 0 0 8px;
+      font-family: Palatino, "Palatino Linotype", Georgia, serif;
+      font-size: 40px;
       font-weight: 600;
       letter-spacing: -0.03em;
-      line-height: 1.05;
+      line-height: 1.02;
     }
     h2 {
-      margin: 0 0 14px;
-      font-size: 18px;
+      margin: 0;
+      font-size: 16px;
       font-weight: 650;
     }
-    .kicker {
-      margin: 0;
-      font-size: 12px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+    .lede, .note, footer { color: var(--muted); font-size: 14px; }
+    .lede { max-width: 62ch; margin: 0; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 168px;
+      gap: 24px;
+      align-items: center;
     }
     .stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin: 28px 0 32px;
+      padding: 0;
+      overflow: hidden;
     }
     .stat {
-      background: var(--card);
-      border: 1px solid var(--line);
-      padding: 16px 16px 14px;
+      padding: 18px 18px 16px;
+      border-right: 1px solid var(--line);
     }
+    .stat:last-child { border-right: 0; }
     .stat b {
       display: block;
-      font-family: Palatino, "Palatino Linotype", serif;
-      font-size: 40px;
+      font-family: Palatino, "Palatino Linotype", Georgia, serif;
+      font-size: 42px;
       font-weight: 600;
-      letter-spacing: -0.03em;
-      line-height: 1;
+      letter-spacing: -0.04em;
+      line-height: 0.95;
     }
     .stat span {
       display: block;
@@ -78,233 +92,238 @@
       color: var(--muted);
       font-size: 13px;
     }
-    section {
-      background: var(--card);
-      border: 1px solid var(--line);
-      padding: 20px 22px 18px;
-      margin-bottom: 16px;
-    }
-    .table-wrap { overflow-x: auto; }
-    table { min-width: 640px; }
-    .row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      grid-template-areas: "name days" "track track";
-      gap: 4px 12px;
-      align-items: center;
-      margin: 14px 0;
-    }
-    .row .name { grid-area: name; }
-    .row .track { grid-area: track; }
-    .row .days { grid-area: days; }
-    .row .name { font-size: 14px; }
-    .row .name small {
-      display: block;
+    .board-head { margin-bottom: 16px; }
+    .board-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .scale {
+      position: relative;
+      height: 28px;
+      margin: 0 0 8px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
+    .scale i {
+      position: absolute;
+      top: 0;
+      font-style: normal;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .scale i::after {
+      content: "";
+      display: block;
+      width: 1px;
+      height: 8px;
+      margin: 2px auto 0;
+      background: #8a8175;
+    }
+    .scale .zero { left: 0; transform: none; }
+    .scale .zero::after { margin-left: 0; }
+    .scale .end { right: 0; left: auto; transform: none; text-align: right; }
+    .scale .end::after { margin-left: auto; }
+    .scale .cut { left: 8.6%; color: var(--ink); font-weight: 650; transform: none; }
+    .scale .cut::after { margin-left: 0; }
+    .repo { margin: 0 0 12px; }
+    .repo-top strong { font-size: 14px; font-weight: 650; }
+    .repo-meta { margin: 2px 0 6px; color: var(--muted); font-size: 12px; }
+    .repo-meta b { color: var(--ink); font-weight: 650; }
     .track {
       position: relative;
-      height: 22px;
-      background: #efeae0;
+      height: 14px;
+      background: var(--track);
     }
-    .bar {
-      height: 22px;
-      background: var(--stale);
+    .bar { height: 14px; background: var(--stale); }
+    .bar.fresh { width: 10px; background: var(--fresh); }
+    .columns {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 14px;
     }
-    .bar.fresh { background: var(--fresh); width: 8px; }
-    .cutoff {
-      position: absolute;
-      top: -6px;
-      bottom: -6px;
-      left: 8.6%;
-      width: 1px;
-      background: var(--mark);
-    }
-    .days { text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; }
-    .legend {
-      display: flex;
-      gap: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 8px;
-    }
-    .swatch {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      margin-right: 6px;
-      vertical-align: -1px;
-    }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td {
-      text-align: left;
-      padding: 9px 8px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-    th { color: var(--muted); font-size: 12px; font-weight: 600; }
-    a { color: var(--stale); }
-    .split { display: grid; grid-template-columns: 180px 1fr; gap: 22px; align-items: center; }
-    .donut-wrap { display: flex; align-items: center; gap: 14px; }
-    svg { display: block; }
-    .lang { margin: 8px 0; }
-    .lang .meta {
-      display: flex;
-      justify-content: space-between;
+    .columns .board { margin: 0; }
+    .mix { display: flex; height: 22px; width: 100%; background: var(--track); margin: 8px 0 14px; }
+    .mix span { display: block; height: 22px; }
+    .shares { margin: 0; padding: 0; list-style: none; }
+    .shares li {
+      display: grid;
+      grid-template-columns: 14px 1fr auto;
+      gap: 8px;
+      align-items: baseline;
+      padding: 7px 0;
+      border-top: 1px solid var(--line);
       font-size: 13px;
-      margin-bottom: 4px;
     }
-    .lang .track { height: 10px; }
-    .lang .bar { height: 10px; background: #3f4f3a; }
+    .dot { width: 10px; height: 10px; margin-top: 4px; }
+    .shares b { font-weight: 600; }
+    .shares em { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .ring-copy { margin: 8px 0 0; color: var(--muted); font-size: 13px; text-align: center; }
+    svg { display: block; margin: 0 auto; }
+    .branches { margin: 0; padding: 0; list-style: none; }
+    .branches li {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 0;
+      border-top: 1px solid var(--line);
+    }
+    .age {
+      font-family: Palatino, "Palatino Linotype", Georgia, serif;
+      font-size: 28px;
+      line-height: 1;
+      color: var(--stale);
+    }
+    .age small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-family: "Segoe UI", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .branches a { color: var(--ink); font-weight: 650; text-decoration: none; }
+    .branches a:hover { color: var(--stale); }
+    .branches p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
     .note { margin: 12px 0 0; }
-    footer { margin-top: 8px; }
+    footer { margin-top: 14px; }
     @media (max-width: 800px) {
-      .stats { grid-template-columns: 1fr 1fr; }
-      .split { grid-template-columns: 1fr; }
       h1 { font-size: 32px; }
+      .hero, .stats, .columns, .branches li { grid-template-columns: 1fr; }
+      .stat { border-right: 0; border-bottom: 1px solid var(--line); }
+      .stat:last-child { border-bottom: 0; }
+      .age { font-size: 22px; }
     }
   </style>
 </head>
 <body>
   <main>
-    <header>
-      <p class="kicker">RepoHealth · free GitHub API · 21 Nov 2026</p>
-      <h1>Four of five public repositories have gone quiet.</h1>
-      <p>Get-RepoStaleBranch read zainulabdin1472’s public repositories with the free GitHub REST API. A branch counts as stale when its latest commit is older than 30 days. No GitHub Actions minutes were used.</p>
-    </header>
+    <section class="board hero">
+      <div>
+        <p class="kicker">RepoHealth · free GitHub API · 21 Nov 2026</p>
+        <h1>Four of five public repositories have gone quiet.</h1>
+        <p class="lede">Get-RepoStaleBranch read zainulabdin1472’s public repositories. A branch is stale when its latest commit is older than 30 days. This page used the free GitHub API only.</p>
+      </div>
+      <div>
+        <svg width="148" height="148" viewBox="0 0 148 148" role="img" aria-label="80 percent of repositories are stale">
+          <circle cx="74" cy="74" r="54" fill="none" stroke="#dceadf" stroke-width="16"></circle>
+          <circle cx="74" cy="74" r="54" fill="none" stroke="#8d3d24" stroke-width="16"
+            stroke-dasharray="271.4 67.9" transform="rotate(-90 74 74)"></circle>
+          <text x="74" y="70" text-anchor="middle" font-size="28" font-family="Palatino, Georgia, serif" fill="#1b1714">80%</text>
+          <text x="74" y="90" text-anchor="middle" font-size="11" fill="#6d655c">stale</text>
+        </svg>
+        <p class="ring-copy">4 stale · 1 current</p>
+      </div>
+    </section>
 
-    <div class="stats">
+    <section class="board stats" aria-label="Scan totals">
       <div class="stat"><b>5</b><span>public repositories scanned</span></div>
       <div class="stat"><b>4</b><span>stale default branches</span></div>
       <div class="stat"><b>1,188</b><span>combined days since those tips</span></div>
       <div class="stat"><b>347</b><span>days since the oldest commit</span></div>
-    </div>
-
-    <section>
-      <h2>Age of the default branch</h2>
-      <div class="row">
-        <div class="name">dotnet-jwt-authentication<small>last commit 9 Dec 2025</small></div>
-        <div class="track"><span class="cutoff" title="30-day cutoff"></span><div class="bar" style="width:100%"></div></div>
-        <div class="days">347</div>
-      </div>
-      <div class="row">
-        <div class="name">Financial-Risk-Assessment<small>last commit 14 Jan 2026</small></div>
-        <div class="track"><span class="cutoff"></span><div class="bar" style="width:89.6%"></div></div>
-        <div class="days">311</div>
-      </div>
-      <div class="row">
-        <div class="name">databricks-genai-pipeline<small>last commit 1 Mar 2026</small></div>
-        <div class="track"><span class="cutoff"></span><div class="bar" style="width:76.4%"></div></div>
-        <div class="days">265</div>
-      </div>
-      <div class="row">
-        <div class="name">multi-tenant-saas-backend<small>last commit 1 Mar 2026</small></div>
-        <div class="track"><span class="cutoff"></span><div class="bar" style="width:76.4%"></div></div>
-        <div class="days">265</div>
-      </div>
-      <div class="row">
-        <div class="name">PowerShell-RepoPulse<small>pushed today, under the cutoff</small></div>
-        <div class="track"><span class="cutoff"></span><div class="bar fresh"></div></div>
-        <div class="days">0</div>
-      </div>
-      <div class="legend">
-        <span><i class="swatch" style="background:#9a3412"></i>Stale, older than 30 days</span>
-        <span><i class="swatch" style="background:#1f6b4a"></i>Current</span>
-        <span><i class="swatch" style="background:#1c1915"></i>30-day cutoff</span>
-      </div>
-      <p class="note">Bar length is the branch age divided by 347 days, the oldest tip in this scan. The black line sits at 30 days on that same scale.</p>
     </section>
 
-    <section>
-      <div class="split">
-        <div class="donut-wrap">
-          <svg width="148" height="148" viewBox="0 0 148 148" role="img" aria-label="4 stale repositories and 1 current repository">
-            <circle cx="74" cy="74" r="54" fill="none" stroke="#dceadf" stroke-width="18"></circle>
-            <circle cx="74" cy="74" r="54" fill="none" stroke="#9a3412" stroke-width="18"
-              stroke-dasharray="271.4 67.9" transform="rotate(-90 74 74)"></circle>
-            <text x="74" y="70" text-anchor="middle" font-size="28" font-family="Palatino, serif" fill="#1c1915">80%</text>
-            <text x="74" y="90" text-anchor="middle" font-size="11" fill="#5e584e">stale</text>
-          </svg>
-        </div>
-        <div>
-          <h2>80% of the public repos are past the cutoff</h2>
-          <p>The average age of the four stale default branches is 297 days. PowerShell-RepoPulse is the only repository whose branch tip is inside the 30-day window, because it was created today.</p>
-        </div>
+    <section class="board stale">
+      <div class="board-head">
+        <h2>Age of the default branch</h2>
+        <p>Days since the latest commit. Scale ends at 347.</p>
       </div>
-    </section>
-
-    <section>
-      <h2>Stale branches returned by the module</h2>
-      <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Repository</th>
-            <th>Branch</th>
-            <th>Age (days)</th>
-            <th>Last commit (UTC)</th>
-            <th>Default</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><a href="https://github.com/zainulabdin1472/dotnet-jwt-authentication">dotnet-jwt-authentication</a></td>
-            <td>main</td>
-            <td>347</td>
-            <td>2025-12-09T07:42:00Z</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td><a href="https://github.com/zainulabdin1472/Financial-Risk-Assessment-via-MC-Simulations">Financial-Risk-Assessment-via-MC-Simulations</a></td>
-            <td>main</td>
-            <td>311</td>
-            <td>2026-01-14T07:53:51Z</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td><a href="https://github.com/zainulabdin1472/databricks-genai-support-ticket-pipeline">databricks-genai-support-ticket-pipeline</a></td>
-            <td>main</td>
-            <td>265</td>
-            <td>2026-03-01T02:26:34Z</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td><a href="https://github.com/zainulabdin1472/multi-tenant-saas-backend">multi-tenant-saas-backend</a></td>
-            <td>main</td>
-            <td>265</td>
-            <td>2026-03-01T01:40:24Z</td>
-            <td>Yes</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="scale" aria-hidden="true">
+        <i class="zero">0</i>
+        <i class="cut">30 days</i>
+        <i class="end">347</i>
       </div>
-    </section>
-
-    <section>
-      <h2>Code measured on the same free API</h2>
-      <p class="note" style="margin-top:0">GitHub’s language endpoint, in bytes. This is context around the scan, not a Dependabot result.</p>
-      <div class="lang">
-        <div class="meta"><span>Jupyter Notebook</span><span>745,800 bytes</span></div>
+      <div class="repo">
+        <div class="repo-top"><strong>dotnet-jwt-authentication</strong></div>
+        <p class="repo-meta"><b>347 days</b> · main · default · 9 Dec 2025</p>
         <div class="track"><div class="bar" style="width:100%"></div></div>
       </div>
-      <div class="lang">
-        <div class="meta"><span>Python</span><span>59,190 bytes</span></div>
-        <div class="track"><div class="bar" style="width:7.9%"></div></div>
+      <div class="repo">
+        <div class="repo-top"><strong>Financial-Risk-Assessment-via-MC-Simulations</strong></div>
+        <p class="repo-meta"><b>311 days</b> · main · default · 14 Jan 2026</p>
+        <div class="track"><div class="bar" style="width:89.6%"></div></div>
       </div>
-      <div class="lang">
-        <div class="meta"><span>PowerShell</span><span>46,573 bytes</span></div>
-        <div class="track"><div class="bar" style="width:6.2%"></div></div>
+      <div class="repo">
+        <div class="repo-top"><strong>databricks-genai-support-ticket-pipeline</strong></div>
+        <p class="repo-meta"><b>265 days</b> · main · default · 1 Mar 2026</p>
+        <div class="track"><div class="bar" style="width:76.4%"></div></div>
       </div>
-      <div class="lang">
-        <div class="meta"><span>C#</span><span>24,679 bytes</span></div>
-        <div class="track"><div class="bar" style="width:3.3%"></div></div>
+      <div class="repo">
+        <div class="repo-top"><strong>multi-tenant-saas-backend</strong></div>
+        <p class="repo-meta"><b>265 days</b> · main · default · 1 Mar 2026</p>
+        <div class="track"><div class="bar" style="width:76.4%"></div></div>
       </div>
-      <p class="note">Mako is 635 bytes and Dockerfile is 335 bytes, both in multi-tenant-saas-backend. They are too small to draw on this scale. Public git trees also show three dependency manifests: requirements.txt in multi-tenant-saas-backend, and SecureJwtApi.sln plus SecureJwtApi.csproj in dotnet-jwt-authentication. Dependabot alert counts are omitted. The free token was refused with HTTP 403 on every alerts request, so a zero would be a guess.</p>
+      <div class="repo">
+        <div class="repo-top"><strong>PowerShell-RepoPulse</strong></div>
+        <p class="repo-meta"><b>0 days</b> · main · default · pushed 21 Nov 2026, inside the cutoff</p>
+        <div class="track"><div class="bar fresh"></div></div>
+      </div>
+      <p class="note">Bar length is age divided by 347 days. The mark at 30 days is the stale cutoff. The green stub is the only branch still inside that window.</p>
     </section>
 
+    <div class="columns">
+      <section class="board">
+        <div class="board-head">
+          <h2>Stale branches the module returned</h2>
+          <p>Average age 297 days</p>
+        </div>
+        <ol class="branches">
+          <li>
+            <div class="age">347<small>days</small></div>
+            <div>
+              <a href="https://github.com/zainulabdin1472/dotnet-jwt-authentication">dotnet-jwt-authentication</a>
+              <p>main · default · 9 Dec 2025</p>
+            </div>
+          </li>
+          <li>
+            <div class="age">311<small>days</small></div>
+            <div>
+              <a href="https://github.com/zainulabdin1472/Financial-Risk-Assessment-via-MC-Simulations">Financial-Risk-Assessment-via-MC-Simulations</a>
+              <p>main · default · 14 Jan 2026</p>
+            </div>
+          </li>
+          <li>
+            <div class="age">265<small>days</small></div>
+            <div>
+              <a href="https://github.com/zainulabdin1472/databricks-genai-support-ticket-pipeline">databricks-genai-support-ticket-pipeline</a>
+              <p>main · default · 1 Mar 2026</p>
+            </div>
+          </li>
+          <li>
+            <div class="age">265<small>days</small></div>
+            <div>
+              <a href="https://github.com/zainulabdin1472/multi-tenant-saas-backend">multi-tenant-saas-backend</a>
+              <p>main · default · 1 Mar 2026</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="board fresh">
+        <div class="board-head">
+          <h2>Code in those repositories</h2>
+          <p>877,212 bytes</p>
+        </div>
+        <div class="mix" role="img" aria-label="Language share of repository bytes">
+          <span style="width:85.02%; background:#8d3d24" title="Jupyter Notebook"></span>
+          <span style="width:6.75%; background:#c46a45" title="Python"></span>
+          <span style="width:5.31%; background:#1d6a46" title="PowerShell"></span>
+          <span style="width:2.81%; background:#3d4a3a" title="C#"></span>
+          <span style="width:0.11%; background:#b7ad9e" title="Mako and Dockerfile"></span>
+        </div>
+        <ul class="shares">
+          <li><i class="dot" style="background:#8d3d24"></i><b>Jupyter Notebook</b><em>85.0% · 745,800</em></li>
+          <li><i class="dot" style="background:#c46a45"></i><b>Python</b><em>6.7% · 59,190</em></li>
+          <li><i class="dot" style="background:#1d6a46"></i><b>PowerShell</b><em>5.3% · 46,573</em></li>
+          <li><i class="dot" style="background:#3d4a3a"></i><b>C#</b><em>2.8% · 24,679</em></li>
+          <li><i class="dot" style="background:#b7ad9e"></i><b>Mako + Dockerfile</b><em>0.1% · 970</em></li>
+        </ul>
+        <p class="note">GitHub language bytes, not Dependabot alerts. Manifests found: requirements.txt, SecureJwtApi.sln, and SecureJwtApi.csproj. Alert counts are omitted because the free token received HTTP 403.</p>
+      </section>
+    </div>
+
     <footer>
-      Source: RepoHealth 0.1.0 calling api.github.com for zainulabdin1472 on 21 Nov 2026. OlderThanDays = 30. Account zainulabdin1472 only. Hassan Kaleem’s git identity was not used.
+      Source: RepoHealth 0.1.0 on api.github.com for zainulabdin1472, 21 Nov 2026. OlderThanDays = 30. Hassan Kaleem’s git identity was not used.
     </footer>
   </main>
 </body>
