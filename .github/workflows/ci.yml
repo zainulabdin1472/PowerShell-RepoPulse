@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  lint-and-test:
+    name: Lint and test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Lint and test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
+          if ($null -eq $nuget -or $nuget.Version -lt [version]'2.8.5.201') {
+              Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
+          }
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module -Name PSScriptAnalyzer -Scope CurrentUser -Force -SkipPublisherCheck
+          Install-Module -Name Pester -MinimumVersion 5.0.0 -MaximumVersion 5.999.999 -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+          Import-Module -Name PSScriptAnalyzer -Force
+          Import-Module -Name Pester -MinimumVersion 5.0.0 -Force
+          $sourcePath = Join-Path -Path $PWD -ChildPath 'src'
+          $settingsPath = Join-Path -Path $PWD -ChildPath 'PSScriptAnalyzerSettings.psd1'
+          $findings = @(Invoke-ScriptAnalyzer -Path $sourcePath -Recurse -Settings $settingsPath -Severity @('Error', 'Warning'))
+          if ($findings.Count -gt 0) {
+              $findings | Format-Table -AutoSize | Out-String | Write-Output
+              throw 'PSScriptAnalyzer reported findings.'
+          }
+          $configuration = New-PesterConfiguration
+          $configuration.Run.Path = Join-Path -Path $PWD -ChildPath 'tests'
+          $configuration.Run.Exit = $true
+          $configuration.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $configuration
